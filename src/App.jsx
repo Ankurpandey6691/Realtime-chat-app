@@ -15,6 +15,7 @@ const ChatDashboard = lazy(() => import('./pages/chatDashboard'));
 const ChatSection = lazy(() => import('./component/chat/chatSection'));
 const UserProfile = lazy(() => import('./pages/userprofile'));
 const SettingsPage = lazy(() => import('./pages/setting/setting'));
+const NewChatPage = lazy(() => import("./pages/newChatPage"));
 
 function App() {
 
@@ -31,7 +32,8 @@ function App() {
 
           <Route path='/' element={<ProtectedRoute />}>
             <Route path='c' element={<ChatDashboard />}>
-              <Route path='chat/:userId' element={<ChatSection />} />
+              <Route path='new-chat' element={<NewChatPage />} />
+              <Route path='chat/:chatId' element={<ChatSection />} />
               <Route path='profile' element={<UserProfile />} />
               <Route path='setting' element={<SettingsPage />} />
             </Route>
@@ -40,7 +42,7 @@ function App() {
           <Route path='/login' element={<Auth />} />
           <Route path='*' element={<NotFound />} />
         </Routes>
-        <ToastContainer/>
+        <ToastContainer />
       </Suspense>
     </>
   )

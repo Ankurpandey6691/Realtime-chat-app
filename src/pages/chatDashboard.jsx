@@ -1,20 +1,17 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { BiDotsVertical } from "react-icons/bi";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, NavLink, Outlet, useLocation, useParams } from "react-router";
+import { Link, NavLink, Outlet, useLocation, } from "react-router";
 import { getMyChats } from "../webservice/chatApi/apis";
 import { toast } from "react-toastify";
 
 const ChatDashboard = () => {
-    const dispatch = useDispatch()
+    const dispatch = useDispatch();
     const { chats } = useSelector(store => store.myChats)
-    const { userId } = useParams();
     const menuRef = useRef(null);
     const { pathname } = useLocation()
     const [showSettings, setShowSettings] = useState(false);
-    const [selectedUser, setSelectedUser] = useState(null);
     const [search, setSearch] = useState("");
-    const { users } = useSelector(store => store.userState)
 
 
     const LogOut = useCallback(() => {
@@ -34,11 +31,6 @@ const ChatDashboard = () => {
 
     }, [dispatch])
 
-    useEffect(() => {
-        if (userId) {
-            setSelectedUser(users.find(ele => ele.id == userId))
-        }
-    }, [userId, users])
 
     // Close dropdown when clicking outside
     useEffect(() => {
@@ -52,7 +44,6 @@ const ChatDashboard = () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
-
 
     // for get all chats
     useEffect(() => {
@@ -82,9 +73,9 @@ const ChatDashboard = () => {
                                         <Link to="/c/profile" className="block w-full text-left px-4 py-2 hover:bg-gray-100">
                                             My Profile
                                         </Link>
-                                        <button className="block w-full text-left px-4 py-2 hover:bg-gray-100">
-                                            New Group
-                                        </button>
+                                        <Link to="/c/new-chat" className="block w-full text-left px-4 py-2 hover:bg-gray-100">
+                                            New Chat
+                                        </Link>
                                         <Link to="/c/setting" className="block w-full text-left px-4 py-2 hover:bg-gray-100">
                                             Setting
                                         </Link>
@@ -111,10 +102,15 @@ const ChatDashboard = () => {
                 </div>
                 <div className="space-y-2 h-8/11 overflow-y-auto">
                     {chats && chats.map((chat, i) => (
-                        <NavLink to={`/c/chat/${chat._id}`}
+                        <NavLink
+                            to={`/c/chat/${chat._id}`}
                             key={i}
+                            state={{
+                                name: chat.isGroup ? chat.group_name : chat.members[1].user_name,
+                                icon: chat.isGroup ? chat.group_icon : chat.members[1].profile_pic,
+                                _id: chat.isGroup ? chat._id : chat.members[1]._id
+                            }}
                             className={({ isActive }) => `flex items-center p-2 rounded-lg cursor-pointer transition ${isActive ? "bg-blue-500 text-white" : "hover:bg-blue-100"}`}
-                            onClick={() => { setSelectedUser(chat.isGroup ? chat : chat.members[1]) }}
                         >
                             <img
                                 src={chat.isGroup ? chat.group_icon : chat.members[1].profile_pic}
@@ -131,7 +127,7 @@ const ChatDashboard = () => {
             {pathname === "/c" ? <div className="flex-1 flex items-center justify-center text-gray-400">
                 <p>Select a user to start chatting 💬</p>
             </div> : <div className="flex-1 flex flex-col">
-                <Outlet context={selectedUser} />
+                <Outlet />
             </div>}
 
         </div>
