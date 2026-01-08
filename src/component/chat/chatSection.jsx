@@ -7,6 +7,7 @@ import { Link, useLocation, useParams } from 'react-router'
 import { getMyChatMessages, sendMessages } from '../../webservice/chatApi/apis';
 import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
+import { socket } from "../../webservice/Websocket/socket"
 
 export default function ChatSection() {
 
@@ -43,7 +44,6 @@ export default function ChatSection() {
         try {
             let response = await sendMessages(obj);
             if (response.success) {
-                setMessages(prev => [...prev, response.data]);
                 setNewMessage("");
             } else {
                 toast.error(response.message);
@@ -51,8 +51,8 @@ export default function ChatSection() {
         } catch (error) {
             toast.error(error.message || "Server Error")
         }
-        
-    }, [chatId,newMessage]);
+
+    }, [chatId, newMessage]);
 
     const getTickIcon = ({ seen, delivered }) => {
         if (seen.length) {
@@ -82,6 +82,13 @@ export default function ChatSection() {
         fetchAllChatMessages()
     }, [fetchAllChatMessages]);
 
+    useEffect(() => {
+        socket.emit("chatroom", chatId);
+
+        socket.on("newMessage", (message) => {
+            setMessages((prev) => [...prev, message])
+        })
+    }, [chatId]);
 
     return (
         <>

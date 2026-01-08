@@ -2,12 +2,13 @@ import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate, Outlet, useNavigate } from "react-router";
 import { authMe } from "../webservice/authApi";
+import { socket } from "../webservice/Websocket/socket";
 
 export default function ProtectedRoute() {
     const navigate = useNavigate()
     const dispatch = useDispatch()
     let auth = window.localStorage.getItem("token");
-    const { logged } = useSelector(store => store.loggedState)
+    const { logged, users } = useSelector(store => store.loggedState)
 
     const fetchLoggedInUser = useCallback(async () => {
         if (auth && !logged) {
@@ -24,6 +25,16 @@ export default function ProtectedRoute() {
     useEffect(() => {
         fetchLoggedInUser()
     }, [fetchLoggedInUser]);
+
+
+    useEffect(() => {
+        socket.connect();
+        socket.emit("join", users._id);
+       
+        return ()=>{
+            socket.disconnect()
+        }
+    }, [users._id])
 
     return (
         <>

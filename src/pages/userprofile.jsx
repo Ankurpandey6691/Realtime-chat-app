@@ -1,7 +1,8 @@
-import React, { useState } from "react";
 import { IoArrowBack } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router";
+import { uploadDp } from "../webservice/authApi";
+import { toast } from "react-toastify";
 
 const UserProfile = () => {
 
@@ -12,12 +13,23 @@ const UserProfile = () => {
         dispatch({ type: "loggedSlice/LOG_USER", payload: { success: true, data: { ...users, bio: e.target.value } } });
     };
 
-    const handleFileUpload = (e) => {
+    const handleFileUpload = async (e) => {
         const file = e.target.files?.[0];
-        if (file) {
-            const url = URL.createObjectURL(file);
-            dispatch({ type: "loggedSlice/LOG_USER", payload: { success: true, data: { ...users, profile_pic: url } } });
-            // 🔗 Upload file to backend/cloud here
+        if (!file) return;
+
+        let payload = new FormData();
+        payload.append("profile_pic", file)
+
+        try {
+            let response = await uploadDp(payload);
+            if (response.success) {
+                dispatch({ type: "loggedSlice/LOG_USER", payload: { success: true, data: response.data } });
+                toast.success(response.message)
+            } else {
+                toast.error(response.message)
+            }
+        } catch (error) {
+            toast.error(error.message)
         }
     };
 

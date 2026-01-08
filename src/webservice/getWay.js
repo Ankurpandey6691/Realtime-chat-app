@@ -1,6 +1,6 @@
 import axios from "axios"
 
-export default async function apiRequest(method, url, data = {}, params = {}) {
+export default async function apiRequest(method, url, data = {}, params = {} , headers = {}) {
     let auth = window.localStorage.getItem("token");
     try {
         const config = {
@@ -8,8 +8,8 @@ export default async function apiRequest(method, url, data = {}, params = {}) {
             url,
             params,
             headers: {
+                 ...headers,
                 'Authorization': `Bearer ${auth}`,
-                "Content-Type": "application/json"
             }, // merge extra options like headers, params, etc.
         };
 
