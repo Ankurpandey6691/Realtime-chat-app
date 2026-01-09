@@ -15,6 +15,7 @@ export default function ChatSection() {
     const { state } = useLocation();
     const { users } = useSelector(store => store.loggedState)
     const menuRef = useRef(null);
+    const messagesEndRef = useRef();
     const [showSettings, setShowSettings] = useState(false);
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState("");
@@ -90,10 +91,15 @@ export default function ChatSection() {
         })
     }, [chatId]);
 
+    //  // Auto scroll when messages update
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [messages]);
+
     return (
         <>
             {/* Chat Header */}
-            <div className="bg-white shadow-md p-2.5 flex justify-between items-center">
+            <div className="flex items-center justify-between p-2 border-b border-gray-400 bg-white shadow-sm">
                 <div className="flex items-center space-x-3">
                     <Link to="/c" className='cursor-pointer p-2 rounded-xl bg-gray-200'>
                         <IoArrowBack
@@ -157,11 +163,11 @@ export default function ChatSection() {
             </div>
 
             {/* Chat Messages */}
-            <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-gray-50">
+            <div className="flex-1 p-4 overflow-y-auto bg-gray-50">
                 {messages && messages.map((msg, i) => (
                     <div
                         key={i}
-                        className={`flex ${msg.sender._id === users._id ? "justify-end" : "justify-start"
+                        className={`flex mb-2 ${msg.sender._id === users._id ? "justify-end" : "justify-start"
                             }`}
                     >
                         <div
@@ -177,10 +183,12 @@ export default function ChatSection() {
                         </div>
                     </div>
                 ))}
+
+              <div ref={messagesEndRef} />
             </div>
 
             {/* Message Input */}
-            <div className="p-4 bg-white flex items-center">
+            <div className="flex items-center p-3 border-t border-gray-400 bg-white">
                 <input
                     type="text"
                     placeholder="Type a message..."

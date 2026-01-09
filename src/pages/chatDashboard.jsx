@@ -52,9 +52,9 @@ const ChatDashboard = () => {
     }, [fetchMyChats]);
 
     return (
-        <div className="min-h-screen overflow-y-auto flex bg-gray-100 text-gray-800">
+        <div className="flex h-screen">
             {/* Sidebar */}
-            <div className="h-screen w-72 bg-white shadow-lg border-r border-gray-400">
+            <div className="h-screen w-1/4 bg-white shadow-lg border-r border-gray-400">
                 <div className="">
                     <div className="px-4 pt-4">
                         <div className="flex justify-between pb-3 items-center">
@@ -127,12 +127,13 @@ const ChatDashboard = () => {
                 </div>
             </div>
 
+            <div className="flex-1 flex flex-col">
+                <Outlet />
+            </div>
             {/* Chat Section */}
             {
-                pathname === "/c" ? <div className="flex-1 flex items-center justify-center text-gray-400">
+                pathname === "/c" && <div className="flex-1 flex items-center justify-center text-gray-400">
                     <p>Select a user to start chatting 💬</p>
-                </div> : <div className="flex-1 flex flex-col">
-                    <Outlet />
                 </div>
             }
 

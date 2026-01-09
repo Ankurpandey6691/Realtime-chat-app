@@ -4,12 +4,32 @@ import { IoReturnUpBack } from 'react-icons/io5';
 import { useNavigate } from 'react-router';
 import { toast } from 'react-toastify';
 import { getAccessChat } from '../webservice/chatApi/apis';
+import endpointUrls from '../webservice/endpointUrls';
+import apiRequest from '../webservice/getWay';
+import { debounce } from '../utils/debounce';
 
 export default function NewChatPage() {
     const navigate = useNavigate()
     const [open, setOpen] = useState(false);
-    const [searchResults, setSearchResults] = useState([{user_name : "suresh",_id : 25565}])
+    const [searchResults, setSearchResults] = useState([])
 
+    const searchUser = useCallback(async (query) => {
+        if (!query) return setSearchResults([]);
+
+        try {
+            let response = await apiRequest("get", endpointUrls.SEARCH_USER,{}, { q: query })
+
+            if (response.success) {
+                setSearchResults(response.data)
+            } else {
+                toast.error(response.message)
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }, []);
+
+    let debounceSearch = debounce(searchUser, 500);
 
     const getReciver = useCallback(async (id) => {
         try {
@@ -55,6 +75,7 @@ export default function NewChatPage() {
                         <FiSearch className="text-xl mr-2 text-gray-600" />
                         <input
                             type="text"
+                            onChange={(e) => { debounceSearch(e.target.value) }}
                             placeholder="Search users..."
                             className="w-full outline-none bg-transparent"
                         />
